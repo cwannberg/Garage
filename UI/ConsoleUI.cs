@@ -1,5 +1,10 @@
 ﻿
 
+using Garage.Enum;
+using Garage.Handlers;
+using Garage.Models;
+using System.ComponentModel.Design;
+
 namespace Garage.UI;
 
 static class ConsoleUI
@@ -26,7 +31,7 @@ static class ConsoleUI
             Console.WriteLine("2. View vehicle types and their counts");
             Console.WriteLine("3. Add a vehicle");
             Console.WriteLine("4. Remove a vehicle");
-            Console.WriteLine("5. Set capacity for a new garage");
+            Console.WriteLine("5. Build a new garage");
             Console.WriteLine("6. Find vehicle by registration number");
             Console.WriteLine("7. Search for vehicle by specific characteristics");
             Console.WriteLine("8. Exit application");
@@ -37,35 +42,32 @@ static class ConsoleUI
 
             bool successfulInput = int.TryParse(userInput, out int usersChoice);
 
-            if (ValidateInput(userInput, successfulInput, usersChoice))
+            if (InputHandler.ValidateInput(userInput, successfulInput, usersChoice))
             {
                 switch (usersChoice)
                 {
                     case 1:
-                        //View list of parked vehicles
+                        GarageHandler.GetVehicleList();
                         break;
                     case 2:
-                        //View vehicle types and their counts
+                        GarageHandler.GetVehicleTypesAndCount();
                         break;
                     case 3:
-                        //Add a vehicle
+                        AddVehicleMenu();
                         break;
                     case 4:
-                        //Remove a vehicle
+                        RemoveVehicleMenu();
                         break;
                     case 5:
-                        //Set capacity for a new garage
+                        BuildGarageMenu();
                         break;
                     case 6:
-                        //Find vehicle by registration number
                         SearchForRegistrationNumberMenu();
                         break;
                     case 7:
                         SearchForVehicleMenu();
-                        //Search for a vehicle by a specific characteristic
                         break;
                     case 8:
-                        //Exit application
                         continueMenu = false;
                         break;
                     default:
@@ -75,43 +77,70 @@ static class ConsoleUI
         } while (continueMenu);
     }
 
-
-    private static bool ValidateInput(string userInput, bool successfulInput, int usersChoice)
+    private static void BuildGarageMenu()
     {
-        if (string.IsNullOrEmpty(userInput) || !successfulInput || usersChoice > 8)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Please enter a valid number");
-            Console.WriteLine(" ");
-            Console.ResetColor();
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }private static bool ValidateInput(string userInput)
-    {
-        if (string.IsNullOrEmpty(userInput))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Input not valid. Try again");
-            Console.WriteLine(" ");
-            Console.ResetColor();
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        throw new NotImplementedException();
     }
+
+    private static void RemoveVehicleMenu()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void AddVehicleMenu()
+    {
+        bool continueMenu = true;
+        do
+        {
+            Console.WriteLine("What type of vehicle would you like to add to the garage?\n\n");
+            Console.WriteLine("Please select an option by entering the corresponding number:");
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.WriteLine("1. Car");
+            Console.WriteLine("2. Motorcycle");
+            Console.WriteLine("3. Bus");
+            Console.WriteLine("4. Boat");
+            Console.WriteLine("5. Airplane");
+            Console.WriteLine("6. Go back to main menu");
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.Write("Your choice: ");
+
+            string userInput = Console.ReadLine();
+            if (InputHandler.ValidateIntInput(userInput, out int vehicle))
+            {
+                switch (vehicle)
+                {
+                    case 1:
+                        GarageHandler.AddVehicle(VehicleType.Car);
+                        break;
+                    case 2:
+                        GarageHandler.AddVehicle(VehicleType.Motorcycle);
+                        break;
+                    case 3:
+                        GarageHandler.AddVehicle(VehicleType.Bus);
+                        break;
+                    case 4:
+                        GarageHandler.AddVehicle(VehicleType.Boat);
+                        break;
+                    case 5:
+                        GarageHandler.AddVehicle(VehicleType.Airplane);
+                        break;
+                    case 6:
+                        ShowWelcomeMessage();
+                        continueMenu = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } while (continueMenu);
+    }
+
     private static void SearchForRegistrationNumberMenu()
     {
         bool continueMenu = true;
-
         do
         {
-            Console.WriteLine("6. Search for car by registration number");
+            Console.WriteLine("Search for car by registration number");
             Console.WriteLine("Go back to mainmenu by pressing 0");
             Console.WriteLine("Enter registration number: ");
             string registrationNumber = Console.ReadLine().ToLower();
@@ -119,9 +148,9 @@ static class ConsoleUI
             {
                 BackToMainMenu();
             }
-            if (ValidateInput(registrationNumber))
+            if (InputHandler.ValidateBoolInput(registrationNumber))
             {
-
+                GarageHandler.SearchForRegistrationNumber(registrationNumber);
             }
         } while (continueMenu);
     }
@@ -134,11 +163,10 @@ static class ConsoleUI
     {
         Console.WriteLine("Go back to main menu? y/n");
         string userInput = Console.ReadLine().ToLower();
-        if (ValidateInput(userInput)){
+        if (InputHandler.ValidateBoolInput(userInput)){
             if (userInput.Equals("y")){
                 ShowWelcomeMessage();
             }
-            
         }
-    }   
+    }  
 }

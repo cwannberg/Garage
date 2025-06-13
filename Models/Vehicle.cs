@@ -1,56 +1,18 @@
-﻿
+﻿using Garage.Interfaces;
 
-namespace Garage.Models
+namespace Garage.Models;
+
+public class Vehicle : IVehicle
 {
-    internal class Vehicle
+    public string RegistrationNumber { get; set; }
+    public string Color { get; set; }
+    public int NumberOfWheels { get; set; }
+    public string Fuel { get; set; }
+    public Vehicle(string registrationNumber, string color, int numberOfWheels, string fuel)
     {
-
-        private string NumberPlate { get; set; }
-        private string Color { get; set; }
-        private int NumberOfWheels { get; set; }
-        private string Fuel { get; set; }
-        public Vehicle(string numberPlate, string color, int numberOfWheels, string fuel)
-        {
-            NumberPlate = numberPlate;
-            Color = color;
-            NumberOfWheels = numberOfWheels;
-            Fuel = fuel;
-        }
+        RegistrationNumber = registrationNumber;
+        Color = color;
+        NumberOfWheels = numberOfWheels;
+        Fuel = fuel;
     }
-
-    class Airplane : Vehicle
-    {
-        public Airplane(string numberPlate, string color, int numberOfWheels, string fuel, int wingspan) : base(numberPlate, color, numberOfWheels, fuel)
-        {
-        }
-    }
-
-    class Motorcycle : Vehicle
-    {
-        public Motorcycle(string numberPlate, string color, int numberOfWheels, string fuel, bool hasSidecar) : base(numberPlate, color, numberOfWheels, fuel)
-        {
-        }
-    }
-
-    class Car : Vehicle
-    {
-        public Car(string numberPlate, string color, int numberOfWheels, string fuel, int numberOfDoors) : base(numberPlate, color, numberOfWheels, fuel)
-        {
-        }
-    }
-
-    class Bus : Vehicle
-    {
-        public Bus(string numberPlate, string color, int numberOfWheels, string fuel, int passengerCapacity) : base(numberPlate, color, numberOfWheels, fuel)
-        {
-        }
-    }
-
-    class Boat : Vehicle
-    {
-        public Boat(string numberPlate, string color, int numberOfWheels, string fuel, int horsepower) : base(numberPlate, color, numberOfWheels, fuel)
-        {
-        }
-    }
-
 }

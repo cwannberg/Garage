@@ -4,15 +4,25 @@ namespace Garage.Models;
 
 internal class Garage<T> : IEnumerable<T> where T : Vehicle
 {
-
-
-
-
-
+    private int Capacity { get; set; }
+    private List<T> vehicles = new List<T>();
+    public Garage()
+    {
+    }
+    public Garage(int capacity)
+    {
+        Capacity = capacity;
+    }
+    public void Add(T item)
+    {
+        if (vehicles.Count >= Capacity)
+            throw new InvalidOperationException("Garage is full.");
+        vehicles.Add(item);
+    }
 
     public IEnumerator<T> GetEnumerator()
     {
-        throw new NotImplementedException();
+        return vehicles.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
