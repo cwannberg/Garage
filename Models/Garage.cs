@@ -6,9 +6,7 @@ internal class Garage<T> : IEnumerable<T> where T : Vehicle
 {
     private int Capacity { get; set; }
     private List<T> vehicles = new List<T>();
-    public Garage()
-    {
-    }
+
     public Garage(int capacity)
     {
         Capacity = capacity;
@@ -28,5 +26,10 @@ internal class Garage<T> : IEnumerable<T> where T : Vehicle
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    internal void Remove(T item)
+    {
+        vehicles.Remove(item);
     }
 }
