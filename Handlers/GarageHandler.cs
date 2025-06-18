@@ -4,19 +4,14 @@ using Garage.Models;
 namespace Garage.Handlers;
 
 internal class GarageHandler
-
 {
-    private int capacity;
+    public int Capacity { get; }
     private Garage<Vehicle> garage;
 
     public GarageHandler(int capacity)
     {
-         garage = new(capacity);
-    }
-
-    public void AddVehicle(Vehicle vehicle)
-    {
-        garage.Add(vehicle);
+        Capacity = capacity;
+        garage = new(capacity);
     }
 
     public void RemoveVehicle(Vehicle vehicle)
@@ -26,12 +21,18 @@ internal class GarageHandler
 
     public void GetListOfVehiclesFromGarage()
     {
+        if (garage == null || !garage.Any())
+        {
+            InputHandler.InvalidInputMessage("The garage is empty.");
+            return;
+        }
+
         garage.ToList().Select((g, index) => new { g, index })
             .ToList()
             .ForEach(x =>
-    {
-        Console.WriteLine($"[{x.index + 1}] {x.g}");
-    });
+        {
+             Console.WriteLine($"[{x.index + 1}] {x.g}");
+        });
     }
 
     internal Vehicle SearchForVehicleWithRegNumber(string registrationNumber)
@@ -72,6 +73,18 @@ internal class GarageHandler
 
         Console.WriteLine($"There are {count} {vehicleType}s in the garage");
     }
+    public int VehiclesCount()
+    {
+        return garage.Count();
+    }
+    public bool GarageIsFull()
+    {
+        if(garage.Count() >= Capacity)
+        {
+            InputHandler.InvalidInputMessage("The garage is full");
+        }
+        return false;
+    }
 
     internal void CreateVehicle(string regNo, string color, int numberOfWheels, string fuel, VehicleType vehicleType)
     {
@@ -97,58 +110,116 @@ internal class GarageHandler
     private void CreateCar(string regNo, string color, int numberOfWheels, string fuel)
     {
         Console.WriteLine("Number of seats: ");
-        int numberOfSeats = int.Parse(Console.ReadLine());
-        Car car = new(regNo, color, numberOfWheels, fuel, numberOfSeats);
+        string userInput = Console.ReadLine();
+        if (InputHandler.ValidateIntInput(userInput, out int numberOfSeats))
+        {
+            Car newCar = new(regNo, color, numberOfWheels, fuel, numberOfSeats);
 
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"You added a car.\n" +
-            $"Registration number {car.RegistrationNumber}\n" +
-            $"Color: {car.Color}.\n" +
-            $"Number of wheels: {car.NumberOfWheels} wheels\n" +
-            $"{car.NumberOfSeats} seats\n" +
-            $"fueled by {car.Fuel}");
-        Console.ForegroundColor = ConsoleColor.White;
-        garage.Add(car);
+            InputHandler.ValidInputMessage(
+                @$"You added a car: 
+                Registration number: {newCar.RegistrationNumber} 
+                Color:               {newCar.Color} 
+                Number of wheels:    {newCar.NumberOfWheels}
+                Fueled by:           {newCar.Fuel}
+                Number of seats:     {newCar.NumberOfSeats}" 
+            );
+            garage.Add(newCar);
+        }
     }
     private void CreateMotorcycle(string regNo, string color, int numberOfWheels, string fuel)
     {
         Console.WriteLine("Does the motorcycle have a sidecar? y/n");
 
-        //TODO: Lägg till input validering här.
         string userInput = Console.ReadLine();
-        if (userInput.Equals("y"))
-        {
-            Motorcycle sidecarMc = new(regNo, color, numberOfWheels, fuel, true);
-            garage.Add(sidecarMc);
-        }
-        else
-        {
-            Motorcycle newMc = new(regNo, color, numberOfWheels, fuel, false);
-            garage.Add(newMc);
+        if (InputHandler.ValidateStringInput(userInput)){
+            string sideCar = "No";
+            if (userInput.Equals("y"))
+            {
+                Motorcycle NewMcWithSideCar = new(regNo, color, numberOfWheels, fuel, true);
+                
+                if (NewMcWithSideCar.HasSideCar)
+                {
+                    sideCar = "Yes";
+                }
+
+                InputHandler.ValidInputMessage(
+                @$"You added a motorcycle: 
+                Registration number: {NewMcWithSideCar.RegistrationNumber} 
+                Color:               {NewMcWithSideCar.Color} 
+                Number of wheels:    {NewMcWithSideCar.NumberOfWheels} wheels 
+                Fueled by:           {NewMcWithSideCar.Fuel}
+                Has a sidecar:       {sideCar}"
+                );
+                garage.Add(NewMcWithSideCar);
+            }
+            else
+            {
+                Motorcycle newMc = new(regNo, color, numberOfWheels, fuel, false);
+                InputHandler.ValidInputMessage(
+                @$"You added a motorcycle: 
+                Registration number: {newMc.RegistrationNumber} 
+                Color:               {newMc.Color} 
+                Number of wheels:    {newMc.NumberOfWheels}
+                Fueled by:           {newMc.Fuel}
+                Has a sidecar:       {sideCar}"
+            );
+                garage.Add(newMc);
+            }
         }
     }
     private void CreateBus(string regNo, string color, int numberOfWheels, string fuel)
     {
-        //TODO: Lägg till input validering här.//TODO: Lägg till input validering här.
-        Console.WriteLine("Number of passengers alowed on bus: ");
-        int passengerCapacity = int.Parse(Console.ReadLine());
-        Bus newBus = new(regNo, color, numberOfWheels, fuel, passengerCapacity);
-        garage.Add(newBus);
+        Console.WriteLine("Number of passengers allowed on bus: ");
+        string userInput = Console.ReadLine();
+        if (InputHandler.ValidateIntInput(userInput, out int passengerCapacity))
+        {
+            Bus newBus = new(regNo, color, numberOfWheels, fuel, passengerCapacity);
+            InputHandler.ValidInputMessage(
+                @$"You added a bus: 
+                Registration number: {newBus.RegistrationNumber} 
+                Color:               {newBus.Color} 
+                Number of wheels:    {newBus.NumberOfWheels}
+                Fueled by:           {newBus.Fuel}
+                Passenger capacity:  {newBus.PassangerCapacity}"
+            );
+            garage.Add(newBus);
+        }
     }
     private void CreateBoat(string regNo, string color, int numberOfWheels, string fuel)
     {
-        //TODO: Lägg till input validering här.
         Console.WriteLine("Boat's horsepower: ");
-        int horsepower = int.Parse(Console.ReadLine());
-        Boat newBoat = new(regNo, color, numberOfWheels, fuel, horsepower);
-        garage.Add(newBoat);
+        string userInput = Console.ReadLine();
+        if (InputHandler.ValidateIntInput(userInput, out int horsepower))
+        {
+            Boat newBoat = new(regNo, color, numberOfWheels, fuel, horsepower);
+            InputHandler.ValidInputMessage(
+                @$"You added a boat: 
+                Registration number: {newBoat.RegistrationNumber} 
+                Color:               {newBoat.Color} 
+                Number of wheels:    {newBoat.NumberOfWheels} 
+                Fueled by:           {newBoat.Fuel}
+                Horsepower:          {newBoat.Horsepower}"
+                );
+            garage.Add(newBoat);
+        }
     }
     private void CreateAirplane(string regNo, string color, int numberOfWheels, string fuel)
     {
-        //TODO: Lägg till input validering här.
         Console.WriteLine("Wingspan in meters: ");
-        int wingspan = int.Parse(Console.ReadLine());
-        Airplane newAirplane = new(regNo, color, numberOfWheels, fuel, wingspan);
-        garage.Add(newAirplane);
+        string userInput = Console.ReadLine();
+        if (InputHandler.ValidateIntInput(userInput, out int wingspan))
+        {
+            Airplane newAirplane = new(regNo, color, numberOfWheels, fuel, wingspan);
+            InputHandler.ValidInputMessage(
+                @$"You added an airplane: 
+                Registration number: {newAirplane.RegistrationNumber} 
+                Color:               {newAirplane.Color} 
+                Number of wheels:    {newAirplane.NumberOfWheels} 
+                Fueled by:           {newAirplane.Fuel}
+                Wingspan:            {newAirplane.Wingspan}"
+            );
+            garage.Add(newAirplane);
+        }
     }
+
 }

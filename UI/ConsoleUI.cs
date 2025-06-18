@@ -8,7 +8,6 @@ namespace Garage.UI;
 internal class ConsoleUI
 {
     private GarageHandler _garageHandler;
-    private CreateVehicleHandler _createVehicleHandler;
 
     internal void ShowWelcomeMessage()
     {
@@ -45,9 +44,8 @@ internal class ConsoleUI
             Console.Write("Your choice: ");
 
             string userInput = Console.ReadLine();
-            bool successfulInput = int.TryParse(userInput, out int usersChoice);
 
-            if (InputHandler.ValidateInput(userInput, successfulInput, usersChoice))
+            if (InputHandler.ValidateIntInput(userInput, out int usersChoice))
             {
                 switch (usersChoice)
                 {
@@ -88,30 +86,25 @@ internal class ConsoleUI
         string userInput = Console.ReadLine();
 
         if(InputHandler.ValidateIntInput(userInput, out int capacity)){
-
-            if (capacity > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                _garageHandler = new(capacity);
-
-                Console.WriteLine($"The garage is built and has {capacity} parking spots");
-                Console.ForegroundColor = ConsoleColor.White;
-                return _garageHandler;
-            }
-            else
-            {
-                Console.WriteLine("The garage must have 1 or more parking spots");
-                BuildGarageMenu();
-            }
+            _garageHandler = new(capacity);
+            InputHandler.ValidInputMessage($"The garage is built and has {capacity} parking spots");
+            return _garageHandler;
         }
         else
         {
+            InputHandler.InvalidInputMessage("The garage must have 1 or more parking spots");
             BuildGarageMenu();
         }
+
         return _garageHandler;
     }
     private void GetVehicleTypesAndCountMenu()
     {
+        if (_garageHandler.VehiclesCount() < 1)
+        {
+            InputHandler.InvalidInputMessage("The garage is empty");
+            return;
+        }
         bool continueMenu = true;
         do
         {
@@ -140,7 +133,7 @@ internal class ConsoleUI
                         _garageHandler.GetVehicleTypesAndCount(n);
                         break;
                     case 7:
-                        ShowWelcomeMessage();
+                        ShowMainMenu();
                         continueMenu = false;
                         break;
                     default:
@@ -155,23 +148,38 @@ internal class ConsoleUI
     }
     public void CreateVehicleMenu(VehicleType vehicleType)
     {
-        Console.WriteLine("Registration number: ");
-        string regNo = Console.ReadLine().ToLower();
-        if (_garageHandler.IsRegNoAlreadyInUse(regNo))
+        if (_garageHandler.GarageIsFull())
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("A vehicle with this registration number is already parked in the garage.");
-            Console.ForegroundColor = ConsoleColor.White;
-            AddVehicleMenu();
+            return;
         }
-        Console.WriteLine("Color of vehicle: ");
-        string color = Console.ReadLine().ToLower();
-        Console.WriteLine("Number of wheels: ");
-        int numberOfWheels = int.Parse(Console.ReadLine());
-        Console.WriteLine("Type of fuel: ");
-        string fuel = Console.ReadLine();
+        Console.WriteLine("Registration number: ");
+        string userInput = Console.ReadLine();
+        if (InputHandler.ValidateStringInput(userInput))
+        {
+            if (_garageHandler.IsRegNoAlreadyInUse(userInput))
+            {
+                InputHandler.InvalidInputMessage("A vehicle with this registration number is already parked in the garage.");
+                AddVehicleMenu();
+            }
+            Console.WriteLine("Color of vehicle: ");
+            string color = Console.ReadLine().ToLower();
+            if (InputHandler.ValidateStringInput(color))
+            {
+                Console.WriteLine("Number of wheels: ");
+                string numberOfWheelsInput = Console.ReadLine();
 
-        _createVehicleHandler.CreateVehicle(regNo, color, numberOfWheels, fuel, vehicleType);
+                if (InputHandler.ValidateIntInput(numberOfWheelsInput, out int numberOfWheels))
+                {
+                    Console.WriteLine("Type of fuel: ");
+                    string fuel = Console.ReadLine();
+
+                    if (InputHandler.ValidateStringInput(fuel))
+                    {
+                        _garageHandler.CreateVehicle(userInput, color, numberOfWheels, fuel, vehicleType);
+                    }
+                }
+            }
+        }
     }
     private  void RemoveVehicleMenu()
     {
@@ -184,6 +192,10 @@ internal class ConsoleUI
 
     public void AddVehicleMenu()
     {
+        if (_garageHandler.GarageIsFull())
+        {
+            return;
+        }
         bool continueMenu = true;
         do
         {
@@ -220,7 +232,7 @@ internal class ConsoleUI
                         CreateVehicleMenu(VehicleType.Airplane);
                         break;
                     case 6:
-                        ShowWelcomeMessage();
+                        ShowMainMenu();
                         continueMenu = false;
                         break;
                     default:
@@ -239,26 +251,29 @@ internal class ConsoleUI
             Console.WriteLine("Go back to mainmenu by pressing 0");
             Console.WriteLine("Enter registration number: ");
             string registrationNumber = Console.ReadLine().ToLower();
-            if (registrationNumber.Equals("0"))
+            if (InputHandler.ValidateStringInput(registrationNumber))
             {
-                BackToMainMenu();
-            }
-            if (InputHandler.ValidateBoolInput(registrationNumber))
-            {
-                Vehicle vehicle = _garageHandler.SearchForVehicleWithRegNumber(registrationNumber);
-                Console.WriteLine($"Found vehicle with registration number: {registrationNumber}");
-                Console.WriteLine(vehicle.ToString());
+                if (registrationNumber.Equals("0"))
+                {
+                    BackToMainMenu();
+                }
+                else
+                {
+                    Vehicle vehicle = _garageHandler.SearchForVehicleWithRegNumber(registrationNumber);
+                    InputHandler.ValidInputMessage($"Found vehicle with registration number: {registrationNumber}");
+                    Console.WriteLine(vehicle.ToString());
+                }
             }
         } while (continueMenu);
     }
 
     private void BackToMainMenu()
     {
-        Console.WriteLine("Go back to main menu? y/n");
-        string userInput = Console.ReadLine().ToLower();
-        if (InputHandler.ValidateBoolInput(userInput)){
-            if (userInput.Equals("y")){
-                ShowWelcomeMessage();
+        Console.WriteLine("Go back to mainmenu by pressing 0");
+        string userInput = Console.ReadLine();
+        if (InputHandler.ValidateStringInput(userInput)){
+            if (userInput.Equals("0")){
+                ShowMainMenu();
             }
         }
     }  
