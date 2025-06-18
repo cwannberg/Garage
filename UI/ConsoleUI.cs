@@ -5,9 +5,12 @@ using Garage.Models;
 
 namespace Garage.UI;
 
-static class ConsoleUI
+internal class ConsoleUI
 {
-    internal static void ShowWelcomeMessage()
+    private GarageHandler _garageHandler;
+    private CreateVehicleHandler _createVehicleHandler;
+
+    internal void ShowWelcomeMessage()
     {
         Console.Clear();
         Console.WriteLine("╔══════════════════════════════════════════════╗");
@@ -18,8 +21,12 @@ static class ConsoleUI
         Console.WriteLine();
         ShowMainMenu();
     }
-    private static void ShowMainMenu()
+    private  void ShowMainMenu()
     {
+        if (_garageHandler == null)
+        {
+            _garageHandler = BuildGarageMenu();
+        }
         bool continueMenu = true;
         do
         {
@@ -38,22 +45,20 @@ static class ConsoleUI
             Console.Write("Your choice: ");
 
             string userInput = Console.ReadLine();
-
             bool successfulInput = int.TryParse(userInput, out int usersChoice);
-            Garage<Vehicle> garage = new Garage<Vehicle>(10);
-            GarageHandler garageHandler = new GarageHandler();
+
             if (InputHandler.ValidateInput(userInput, successfulInput, usersChoice))
             {
                 switch (usersChoice)
                 {
                     case 1:
-                        garageHandler.GetVehicleList(garage);
+                        GetVehicleList();
                         break;
                     case 2:
-                        GetVehicleTypesAndCountMenu(garage);
+                        GetVehicleTypesAndCountMenu();
                         break;
                     case 3:
-                        AddVehicleMenu(garage);
+                        AddVehicleMenu();
                         break;
                     case 4:
                         RemoveVehicleMenu();
@@ -62,7 +67,7 @@ static class ConsoleUI
                         BuildGarageMenu();
                         break;
                     case 6:
-                        SearchForRegistrationNumberMenu(garage);
+                        SearchForRegistrationNumberMenu();
                         break;
                     case 7:
                         SearchForVehicleMenu();
@@ -76,8 +81,36 @@ static class ConsoleUI
             }
         } while (continueMenu);
     }
+    public GarageHandler BuildGarageMenu()
+    {
+        Console.WriteLine("Let's build a new garage!");
+        Console.WriteLine("How many parking slots does the garage need?");
+        string userInput = Console.ReadLine();
 
-    private static void GetVehicleTypesAndCountMenu(Garage<Vehicle> garage)
+        if(InputHandler.ValidateIntInput(userInput, out int capacity)){
+
+            if (capacity > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                _garageHandler = new(capacity);
+
+                Console.WriteLine($"The garage is built and has {capacity} parking spots");
+                Console.ForegroundColor = ConsoleColor.White;
+                return _garageHandler;
+            }
+            else
+            {
+                Console.WriteLine("The garage must have 1 or more parking spots");
+                BuildGarageMenu();
+            }
+        }
+        else
+        {
+            BuildGarageMenu();
+        }
+        return _garageHandler;
+    }
+    private void GetVehicleTypesAndCountMenu()
     {
         bool continueMenu = true;
         do
@@ -96,7 +129,6 @@ static class ConsoleUI
             Console.WriteLine("-------------------------------------------------------------");
             Console.Write("Your choice: ");
             string userInput = Console.ReadLine();
-            GarageHandler garageHandler = new GarageHandler();
 
             if (InputHandler.ValidateIntInput(userInput, out int vehicle))
             {
@@ -105,7 +137,7 @@ static class ConsoleUI
                     case 1:
                         break;
                     case int n when n >= 2 && n <= 6:
-                        garageHandler.GetVehicleTypesAndCount(n, garage);
+                        _garageHandler.GetVehicleTypesAndCount(n);
                         break;
                     case 7:
                         ShowWelcomeMessage();
@@ -117,24 +149,31 @@ static class ConsoleUI
             }
         } while (continueMenu);
     }
-
-    public static Garage<Vehicle> BuildGarageMenu()
+    internal void GetVehicleList()
     {
-        Console.WriteLine("-------------------------------------------------------------");
-        Console.WriteLine("Let's build a new garage!");
-        Console.WriteLine("-------------------------------------------------------------");
-        Console.WriteLine("How many parking slots does the garage need?");
-        int capacity = int.Parse(Console.ReadLine());
-        Console.ForegroundColor = ConsoleColor.Green;
-        GarageHandler garageHandler = new();
-        Garage<Vehicle> garage = garageHandler.CreateGarage(capacity);
-        Console.WriteLine($"The garage is built and has {capacity} parking spots");
-        Console.ForegroundColor = ConsoleColor.White;
-        return garage;
-       // ShowMainMenu();
+        _garageHandler.GetListOfVehiclesFromGarage();
     }
+    public void CreateVehicleMenu(VehicleType vehicleType)
+    {
+        Console.WriteLine("Registration number: ");
+        string regNo = Console.ReadLine().ToLower();
+        if (_garageHandler.IsRegNoAlreadyInUse(regNo))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("A vehicle with this registration number is already parked in the garage.");
+            Console.ForegroundColor = ConsoleColor.White;
+            AddVehicleMenu();
+        }
+        Console.WriteLine("Color of vehicle: ");
+        string color = Console.ReadLine().ToLower();
+        Console.WriteLine("Number of wheels: ");
+        int numberOfWheels = int.Parse(Console.ReadLine());
+        Console.WriteLine("Type of fuel: ");
+        string fuel = Console.ReadLine();
 
-    private static void RemoveVehicleMenu()
+        _createVehicleHandler.CreateVehicle(regNo, color, numberOfWheels, fuel, vehicleType);
+    }
+    private  void RemoveVehicleMenu()
     {
         throw new NotImplementedException();
     }
@@ -143,10 +182,8 @@ static class ConsoleUI
 
     }
 
-    public static void AddVehicleMenu(Garage<Vehicle> garage)
+    public void AddVehicleMenu()
     {
-        GarageHandler garageHandler = new();
-
         bool continueMenu = true;
         do
         {
@@ -168,19 +205,19 @@ static class ConsoleUI
                 switch (vehicle)
                 {
                     case 1:
-                        garageHandler.CreateVehicleMenu(VehicleType.Car, garage);
+                        CreateVehicleMenu(VehicleType.Car);
                         break;
                     case 2:
-                        garageHandler.CreateVehicleMenu(VehicleType.Motorcycle, garage);
+                        CreateVehicleMenu(VehicleType.Motorcycle);
                         break;
                     case 3:
-                        garageHandler.CreateVehicleMenu(VehicleType.Bus, garage);
+                        CreateVehicleMenu(VehicleType.Bus);
                         break;
                     case 4:
-                        garageHandler.CreateVehicleMenu(VehicleType.Boat, garage);
+                        CreateVehicleMenu(VehicleType.Boat);
                         break;
                     case 5:
-                        garageHandler.CreateVehicleMenu(VehicleType.Airplane, garage);
+                        CreateVehicleMenu(VehicleType.Airplane);
                         break;
                     case 6:
                         ShowWelcomeMessage();
@@ -191,12 +228,10 @@ static class ConsoleUI
                 }
             }
         } while (continueMenu);
-        
     }
 
-    private static void SearchForRegistrationNumberMenu(Garage<Vehicle> garage)
+    private void SearchForRegistrationNumberMenu()
     {
-        GarageHandler garageHandler = new GarageHandler();
         bool continueMenu = true;
         do
         {
@@ -210,12 +245,14 @@ static class ConsoleUI
             }
             if (InputHandler.ValidateBoolInput(registrationNumber))
             {
-                garageHandler.SearchForVehicleWithRegNumber(registrationNumber, garage);
+                Vehicle vehicle = _garageHandler.SearchForVehicleWithRegNumber(registrationNumber);
+                Console.WriteLine($"Found vehicle with registration number: {registrationNumber}");
+                Console.WriteLine(vehicle.ToString());
             }
         } while (continueMenu);
     }
 
-    private static void BackToMainMenu()
+    private void BackToMainMenu()
     {
         Console.WriteLine("Go back to main menu? y/n");
         string userInput = Console.ReadLine().ToLower();

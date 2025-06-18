@@ -11,4 +11,8 @@ class Bus : Vehicle
     {
         PassangerCapacity = passengerCapacity;
     }
+    public override string ToString()
+    {
+        return base.ToString() + $"\n        Passanger capacity: {PassangerCapacity}";
+    }
 }

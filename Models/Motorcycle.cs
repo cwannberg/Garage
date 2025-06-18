@@ -9,4 +9,8 @@ class Motorcycle : Vehicle
     {
         HasSideCar = hasSidecar;
     }
+    public override string ToString()
+    {
+        return base.ToString() + $"\n        Has sidecar:        {HasSideCar}";
+    }
 }

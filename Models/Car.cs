@@ -10,4 +10,8 @@ class Car : Vehicle
     {
         NumberOfSeats = numberOfSeats;
     }
+    public override string ToString()
+    {
+        return base.ToString() + $"\n        Number of seats:    {NumberOfSeats}";
+    }
 }

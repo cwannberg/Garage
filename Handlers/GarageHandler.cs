@@ -1,74 +1,51 @@
 ﻿using Garage.Enum;
 using Garage.Models;
-using Garage.UI;
 
 namespace Garage.Handlers;
 
 internal class GarageHandler
 
 {
- //   public Garage<Vehicle> _garage = new();
-    public Garage<Vehicle> CreateGarage(int capacity)
+    private int capacity;
+    private Garage<Vehicle> garage;
+
+    public GarageHandler(int capacity)
     {
-        Garage<Vehicle> garage = new(capacity);
-        return garage;
+         garage = new(capacity);
     }
 
-    public void RemoveVehicle(Vehicle vehicle, Garage<Vehicle> garage)
+    public void AddVehicle(Vehicle vehicle)
+    {
+        garage.Add(vehicle);
+    }
+
+    public void RemoveVehicle(Vehicle vehicle)
     {
         garage.Remove(vehicle);
     }
 
-    //TODO: Funkar??
-    internal void SearchForVehicleWithRegNumber(string registrationNumber, Garage<Vehicle> garage)
+    public void GetListOfVehiclesFromGarage()
     {
-        Vehicle vehicle = garage.FirstOrDefault(v => v.RegistrationNumber == registrationNumber);
+        garage.ToList().Select((g, index) => new { g, index })
+            .ToList()
+            .ForEach(x =>
+    {
+        Console.WriteLine($"[{x.index + 1}] {x.g}");
+    });
     }
 
-    public static bool IsRegNoAlreadyUsed(string regNo)
+    internal Vehicle SearchForVehicleWithRegNumber(string registrationNumber)
     {
-        return Vehicle.IsRegistrationUsed(regNo);
+        return garage.FirstOrDefault(v => v.RegistrationNumber == registrationNumber);
     }
-    internal void GetVehicleList(Garage<Vehicle> garage)
-    {
-        if(garage.Count() > 0)
-            foreach (var vehicle in garage)
-            {
-                Console.WriteLine($"{vehicle.GetType().Name} - {vehicle.RegistrationNumber} - {vehicle.Color}");
-            }
-        else
-        {
-            Console.WriteLine("The garage is empty");
-        }
-    }
-    public void CreateVehicleMenu(VehicleType vehicleType, Garage<Vehicle> garage)
-    {
 
-        Console.WriteLine("Registration number: ");
-        string regNo = Console.ReadLine().ToLower();
-        if (IsRegNoAlreadyUsed(regNo))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Registreringsnumret finns redan");
-            Console.ForegroundColor = ConsoleColor.White;
-            ConsoleUI.AddVehicleMenu(garage);
-        }
-        Console.WriteLine("Color of vehicle: ");
-        string color = Console.ReadLine().ToLower();
-        Console.WriteLine("Number of wheels: ");
-        int numberOfWheels = int.Parse(Console.ReadLine());
-        Console.WriteLine("Type of fuel: ");
-        string fuel = Console.ReadLine();
-
-        CreateVehicle(regNo, color, numberOfWheels, fuel, vehicleType);
-    }
-    internal void GetVehicleTypesAndCount(int n, Garage<Vehicle> garage)
+    internal bool IsRegNoAlreadyInUse(string regNo)
     {
-        if(garage.Count() == 0)
-        {
-            Console.WriteLine("You dont have a garage, please build one.");
-            ConsoleUI.BuildGarageMenu();
-        }
+        return garage.Any(v => v.RegistrationNumber.Equals(regNo, StringComparison.OrdinalIgnoreCase));
+    }
+
+    internal void GetVehicleTypesAndCount(int n)
+    {
         VehicleType vehicleType;
         switch (n)
         {
@@ -116,7 +93,6 @@ internal class GarageHandler
                 CreateAirplane(regNo, color, numberOfWheels, fuel);
                 break;
         }
-        
     }
     private void CreateCar(string regNo, string color, int numberOfWheels, string fuel)
     {
@@ -132,9 +108,9 @@ internal class GarageHandler
             $"{car.NumberOfSeats} seats\n" +
             $"fueled by {car.Fuel}");
         Console.ForegroundColor = ConsoleColor.White;
-
+        garage.Add(car);
     }
-    private static void CreateMotorcycle(string regNo, string color, int numberOfWheels, string fuel)
+    private void CreateMotorcycle(string regNo, string color, int numberOfWheels, string fuel)
     {
         Console.WriteLine("Does the motorcycle have a sidecar? y/n");
 
@@ -143,31 +119,36 @@ internal class GarageHandler
         if (userInput.Equals("y"))
         {
             Motorcycle sidecarMc = new(regNo, color, numberOfWheels, fuel, true);
+            garage.Add(sidecarMc);
         }
         else
         {
             Motorcycle newMc = new(regNo, color, numberOfWheels, fuel, false);
+            garage.Add(newMc);
         }
     }
-    private static void CreateBus(string regNo, string color, int numberOfWheels, string fuel)
+    private void CreateBus(string regNo, string color, int numberOfWheels, string fuel)
     {
         //TODO: Lägg till input validering här.//TODO: Lägg till input validering här.
         Console.WriteLine("Number of passengers alowed on bus: ");
         int passengerCapacity = int.Parse(Console.ReadLine());
         Bus newBus = new(regNo, color, numberOfWheels, fuel, passengerCapacity);
+        garage.Add(newBus);
     }
-    private static void CreateBoat(string regNo, string color, int numberOfWheels, string fuel)
+    private void CreateBoat(string regNo, string color, int numberOfWheels, string fuel)
     {
         //TODO: Lägg till input validering här.
         Console.WriteLine("Boat's horsepower: ");
         int horsepower = int.Parse(Console.ReadLine());
         Boat newBoat = new(regNo, color, numberOfWheels, fuel, horsepower);
+        garage.Add(newBoat);
     }
-    private static void CreateAirplane(string regNo, string color, int numberOfWheels, string fuel)
+    private void CreateAirplane(string regNo, string color, int numberOfWheels, string fuel)
     {
         //TODO: Lägg till input validering här.
         Console.WriteLine("Wingspan in meters: ");
         int wingspan = int.Parse(Console.ReadLine());
         Airplane newAirplane = new(regNo, color, numberOfWheels, fuel, wingspan);
+        garage.Add(newAirplane);
     }
 }

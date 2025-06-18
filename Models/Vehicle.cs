@@ -1,5 +1,6 @@
 ﻿using Garage.Enum;
 using Garage.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace Garage.Models;
 
@@ -15,24 +16,21 @@ public class Vehicle : IVehicle
 
     public Vehicle(string registrationNumber, string color, int numberOfWheels, string fuel, VehicleType vehicleType)
     {
-        if (usedRegistrationNumbers.Contains(registrationNumber))
-        {
-            Console.WriteLine($"Ett fordon med registreringsnumnber {registrationNumber} finns redan i garaget.");
-            throw new ArgumentException($"Registreringsnumret '{registrationNumber}' används redan.");
-        }
-        else
-        {
-            usedRegistrationNumbers.Add(registrationNumber);
-        }
         RegistrationNumber = registrationNumber;
         Color = color;
         NumberOfWheels = numberOfWheels;
         Fuel = fuel;
         VehicleType = vehicleType;
     }
-
-    public static bool IsRegistrationUsed(string regNo)
+    public override string ToString()
     {
-        return usedRegistrationNumbers.Contains(regNo);
+        return $@"---------------------------------
+        Vehicle Info
+        Type:               {VehicleType}
+        Reg.nr:             {RegistrationNumber}
+        Color:              {Color}
+        Number of wheels:   {NumberOfWheels}
+        Fuel Type:          {Fuel}";
     }
 }
+

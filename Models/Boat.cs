@@ -11,4 +11,8 @@ class Boat : Vehicle
     {
         Horsepower = horsepower;
     }
+    public override string ToString()
+    {
+        return base.ToString() + $"\n        Horsepower:         {Horsepower}";
+    }
 }

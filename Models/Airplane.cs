@@ -12,4 +12,8 @@ class Airplane : Vehicle
     {
         Wingspan = wingspan;
     }
+    public override string ToString()
+    {
+        return base.ToString() + $"\n        Wingspan:           {Wingspan}";
+    }
 }

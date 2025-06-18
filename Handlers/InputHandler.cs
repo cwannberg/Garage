@@ -3,7 +3,6 @@
 namespace Garage.Handlers;
 
 public static class InputHandler
-
 {
     public static bool ValidateInput(string userInput, bool successfulInput, int usersChoice)
     {
