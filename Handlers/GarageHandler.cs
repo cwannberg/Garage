@@ -3,7 +3,7 @@ using Garage.Models;
 
 namespace Garage.Handlers;
 
-internal class GarageHandler
+public class GarageHandler
 {
     public int Capacity { get; }
     private Garage<Vehicle> garage;
@@ -14,9 +14,19 @@ internal class GarageHandler
         garage = new(capacity);
     }
 
-    public void RemoveVehicle(Vehicle vehicle)
+    public void RemoveVehicle(string regNo)
     {
-        garage.Remove(vehicle);
+
+        var vehicleToRemove = garage.FirstOrDefault(v => v.RegistrationNumber.ToLower() == regNo);
+        if (vehicleToRemove != null)
+        {
+            garage.Remove(vehicleToRemove);
+            InputHandler.ValidInputMessage($"The {vehicleToRemove.VehicleType} with registration number {regNo} was successfully removed from the garage.");
+        }
+        else
+        {
+            InputHandler.InvalidInputMessage($"The {vehicleToRemove.VehicleType} with registration number {regNo} not found");
+        }
     }
 
     public void GetListOfVehiclesFromGarage()
@@ -82,6 +92,8 @@ internal class GarageHandler
         if(garage.Count() >= Capacity)
         {
             InputHandler.InvalidInputMessage("The garage is full");
+            
+            return true;
         }
         return false;
     }
@@ -222,4 +234,21 @@ internal class GarageHandler
         }
     }
 
+    //TODO: Funkar EJ!!! Fixa sen
+    internal void SearchForVehicleMultiple(string? vehicleType, string? color, int? numberOfWheels, string? fuel)
+    {
+        var query = garage
+            .Where(v =>
+           (vehicleType == null || v.VehicleType.ToString().Equals(vehicleType, StringComparison.OrdinalIgnoreCase)) &&
+           (color == null || v.Color.Equals(color, StringComparison.OrdinalIgnoreCase)) &&
+           (!numberOfWheels.HasValue || v.NumberOfWheels == numberOfWheels.Value) &&
+           (fuel == null || v.Fuel.Equals(fuel, StringComparison.OrdinalIgnoreCase))
+       );
+
+        foreach (var vehicle in query)
+        {
+            Console.WriteLine(vehicle);
+        }
+
+    }
 }

@@ -32,14 +32,14 @@ internal class ConsoleUI
             Console.WriteLine("-------------------------------------------------------------");
             Console.WriteLine("Please select an option by entering the corresponding number:");
             Console.WriteLine("-------------------------------------------------------------");
-            Console.WriteLine("1. View list of parked vehicles");
-            Console.WriteLine("2. View vehicle types and their counts");
-            Console.WriteLine("3. Add a vehicle");
-            Console.WriteLine("4. Remove a vehicle");
-            Console.WriteLine("5. Build a new garage");
-            Console.WriteLine("6. Find vehicle by registration number");
-            Console.WriteLine("7. Search for vehicle by specific characteristics");
-            Console.WriteLine("8. Exit application");
+            Console.WriteLine("[1] View list of parked vehicles");
+            Console.WriteLine("[2] View vehicle types and their counts");
+            Console.WriteLine("[3] Add a vehicle");
+            Console.WriteLine("[4] Remove a vehicle");
+            Console.WriteLine("[5] Build a new garage");
+            Console.WriteLine("[6] Find vehicle by registration number");
+            Console.WriteLine("[7] Search for vehicle by specific characteristics");
+            Console.WriteLine("[8] Exit application");
             Console.WriteLine("-------------------------------------------------------------");
             Console.Write("Your choice: ");
 
@@ -50,7 +50,7 @@ internal class ConsoleUI
                 switch (usersChoice)
                 {
                     case 1:
-                        GetVehicleList();
+                        _garageHandler.GetListOfVehiclesFromGarage();
                         break;
                     case 2:
                         GetVehicleTypesAndCountMenu();
@@ -95,7 +95,6 @@ internal class ConsoleUI
             InputHandler.InvalidInputMessage("The garage must have 1 or more parking spots");
             BuildGarageMenu();
         }
-
         return _garageHandler;
     }
     private void GetVehicleTypesAndCountMenu()
@@ -142,14 +141,11 @@ internal class ConsoleUI
             }
         } while (continueMenu);
     }
-    internal void GetVehicleList()
-    {
-        _garageHandler.GetListOfVehiclesFromGarage();
-    }
     public void CreateVehicleMenu(VehicleType vehicleType)
     {
         if (_garageHandler.GarageIsFull())
         {
+            ShowMainMenu();
             return;
         }
         Console.WriteLine("Registration number: ");
@@ -181,19 +177,56 @@ internal class ConsoleUI
             }
         }
     }
-    private  void RemoveVehicleMenu()
+    private void RemoveVehicleMenu()
     {
-        throw new NotImplementedException();
+        _garageHandler.GetListOfVehiclesFromGarage();
+        Console.WriteLine("Which vehicle would you like to remove? Enter registration number");
+        string userInput = Console.ReadLine();
+        if(InputHandler.ValidateStringInput(userInput))
+        {
+            _garageHandler.RemoveVehicle(userInput.ToLower());
+        }
     }
-    private static void SearchForVehicleMenu()
+    private void SearchForVehicleMenu()
     {
+        string vehicleType = "";
+        string color = "";
+        int numberOfWheels = -1;
+        string fuel = "";
+        bool continueMenu = true;
 
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.WriteLine("Search for vehicle");
+            Console.WriteLine("Please select an option by entering the corresponding number:");
+            Console.WriteLine("Enter '0' to skip a step.");
+            Console.WriteLine("Enter '9' to go back to main menu");
+            Console.WriteLine("-------------------------------------------------------------");
+
+            Console.WriteLine("Vehicles:");
+            Console.WriteLine("1. Car");
+            Console.WriteLine("2. Motorcycle");
+            Console.WriteLine("3. Bus");
+            Console.WriteLine("4. Boat");
+            Console.WriteLine("5. Airplane");
+            vehicleType = Console.ReadLine(); //TODO:Add validation
+
+            Console.WriteLine("Color:");
+            color = Console.ReadLine(); //TODO:Add validation
+
+            Console.WriteLine("Number of wheels:");
+            numberOfWheels = int.Parse(Console.ReadLine()); //TODO:Add validation
+
+            Console.WriteLine("Fuel:");
+            fuel = Console.ReadLine(); //TODO:Add validation
+
+        _garageHandler.SearchForVehicleMultiple(vehicleType, color, numberOfWheels, fuel);
     }
 
     public void AddVehicleMenu()
     {
         if (_garageHandler.GarageIsFull())
         {
+            ShowMainMenu();
             return;
         }
         bool continueMenu = true;

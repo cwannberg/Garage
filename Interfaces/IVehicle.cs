@@ -1,4 +1,6 @@
-﻿namespace Garage.Interfaces
+﻿using Garage.Enum;
+
+namespace Garage.Interfaces
 {
     public interface IVehicle
     {
@@ -6,5 +8,6 @@
         string Fuel { get; set; }
         int NumberOfWheels { get; set; }
         string RegistrationNumber { get; set; }
+        VehicleType VehicleType { get; set; }
     }
 }
