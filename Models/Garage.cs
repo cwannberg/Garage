@@ -2,7 +2,7 @@
 
 namespace Garage.Models;
 
-internal class Garage<T> : IEnumerable<T> where T : Vehicle
+public class Garage<T> : IEnumerable<T> where T : Vehicle
 {
     private int Capacity { get; set; }
     private List<T> vehicles = new List<T>();
@@ -28,7 +28,7 @@ internal class Garage<T> : IEnumerable<T> where T : Vehicle
         return GetEnumerator();
     }
 
-    internal void Remove(T item)
+    public void Remove(T item)
     {
         vehicles.Remove(item);
     }
