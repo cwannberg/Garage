@@ -12,8 +12,6 @@ public class Vehicle : IVehicle
     public string Fuel { get; set; }
     public VehicleType VehicleType { get; set; }
 
-    private static readonly HashSet<string> usedRegistrationNumbers = new();
-
     public Vehicle(string registrationNumber, string color, int numberOfWheels, string fuel, VehicleType vehicleType)
     {
         RegistrationNumber = registrationNumber;

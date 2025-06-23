@@ -1,5 +1,6 @@
 ﻿using Garage.Enum;
 using Garage.Models;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Garage.Handlers;
 
@@ -25,7 +26,7 @@ public class GarageHandler
         }
         else
         {
-            InputHandler.InvalidInputMessage($"The {vehicleToRemove.VehicleType} with registration number {regNo} not found");
+            InputHandler.InvalidInputMessage($"Vehicle not found");
         }
     }
 
@@ -55,24 +56,24 @@ public class GarageHandler
         return garage.Any(v => v.RegistrationNumber.Equals(regNo, StringComparison.OrdinalIgnoreCase));
     }
 
-    internal void GetVehicleTypesAndCount(int n)
+    internal void GetVehicleTypeAndCount(int n)
     {
         VehicleType vehicleType;
         switch (n)
         {
-            case 2:
+            case 1:
                 vehicleType = VehicleType.Car;
                 break;
-            case 3:
+            case 2:
                 vehicleType = VehicleType.Motorcycle;
                 break;
-            case 4:
+            case 3:
                 vehicleType = VehicleType.Bus;
                 break;
-            case 5:
+            case 4:
                 vehicleType = VehicleType.Boat;
                 break;
-            case 6:
+            case 5:
                 vehicleType = VehicleType.Airplane;
                 break;
             default:
@@ -234,21 +235,28 @@ public class GarageHandler
         }
     }
 
-    //TODO: Funkar EJ!!! Fixa sen
-    internal void SearchForVehicleMultiple(string? vehicleType, string? color, int? numberOfWheels, string? fuel)
+    //TODO: Make this method work according as expected
+    internal void SearchForVehicleWithMultipleChoices(string? vehicleType, string? color, int? numberOfWheels, string? fuel)
     {
-        var query = garage
-            .Where(v =>
-           (vehicleType == null || v.VehicleType.ToString().Equals(vehicleType, StringComparison.OrdinalIgnoreCase)) &&
-           (color == null || v.Color.Equals(color, StringComparison.OrdinalIgnoreCase)) &&
-           (!numberOfWheels.HasValue || v.NumberOfWheels == numberOfWheels.Value) &&
-           (fuel == null || v.Fuel.Equals(fuel, StringComparison.OrdinalIgnoreCase))
-       );
+        var blueVehicles = garage.Where(v => v.Color == "blue");
 
-        foreach (var vehicle in query)
+        foreach (var vehicle in blueVehicles)
         {
             Console.WriteLine(vehicle);
         }
-
+    }
+    internal void GetAllVehicleTypesCount()
+    {
+        Console.WriteLine("Number of vehicles in garage:");
+        Console.WriteLine($"Cars: {CountVehiclesWithLINQ(VehicleType.Car)}");
+        Console.WriteLine($"Motorcycles: {CountVehiclesWithLINQ(VehicleType.Motorcycle)}");
+        Console.WriteLine($"Buses: {CountVehiclesWithLINQ(VehicleType.Bus)}");
+        Console.WriteLine($"Boats: {CountVehiclesWithLINQ(VehicleType.Boat)}");
+        Console.WriteLine($"Airplanes: {CountVehiclesWithLINQ(VehicleType.Airplane)}");
+    }
+    internal int CountVehiclesWithLINQ(VehicleType vehicleType)
+    {
+        int numberOfVehicles = garage.Count(v => v.VehicleType == vehicleType);
+        return numberOfVehicles;
     }
 }
